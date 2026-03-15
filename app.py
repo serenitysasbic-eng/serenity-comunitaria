@@ -1,52 +1,60 @@
 import streamlit as st
 import pandas as pd
-import folium
-from streamlit_folium import st_folium
+from datetime import datetime
 
-# Configuración de la página
-st.set_page_config(page_title="Serenity Nexus Comunitaria", layout="wide")
+# --- CONFIGURACIÓN DE MARCA ---
+st.set_page_config(page_title="Serenity Nexus - Comunidad", layout="wide")
 
-# Título y Estilo
-st.title("🌱 Red Comunitaria: Felidia - Dagua")
-st.markdown("### Conectando Sabores, Saberes y Turismo")
+st.markdown("""
+    <style>
+    .main { background-color: #f5f7f1; }
+    .stButton>button { background-color: #2e7d32; color: white; border-radius: 20px; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# 1. Base de datos simulada (Luego la pasaremos a un Google Sheet o JSON)
-data = {
-    'Zona': ['Felidia', 'La Leonera', 'Tocota', 'El Carmen', 'Dagua', 'San Bernardo', 'Alto Dagua', 'Hacienda Monte Guadua'],
-    'Tipo': ['Turismo', 'Agro', 'Servicios', 'Agro', 'Turismo', 'Servicios', 'Agro', 'Proyecto Serenity'],
-    'Nombre': ['Cascadas del Pato', 'Café Orgánico Familiar', 'Mecánico de Motos', 'Cosecha de Mora', 'Hotel Campestre', 'Construcciones Locales', 'Piña de Exportación', 'SNG Hub'],
-    'Lat': [3.45, 3.44, 3.50, 3.55, 3.60, 3.58, 3.62, 3.48],
-    'Lon': [-76.60, -76.62, -76.65, -76.68, -76.70, -76.72, -76.75, -76.63]
-}
-df = pd.DataFrame(data)
+# --- INTERFAZ DE USUARIO ---
+st.title("🏔️ Serenity Nexus: La Red de nuestra Tierra")
+st.sidebar.image("https://via.placeholder.com/150", caption="Serenity S.A.S BIC") # Aquí irá tu logo
 
-# 2. Barra Lateral - Filtros
-st.sidebar.header("Filtros de Búsqueda")
-zona_seleccionada = st.sidebar.selectbox("Selecciona una localidad:", ["Todas"] + list(df['Zona'].unique()))
-tipo_seleccionado = st.sidebar.multiselect("¿Qué buscas?", df['Tipo'].unique(), default=df['Tipo'].unique())
+menu = ["Ver Muro Comunitario", "Publicar mi Servicio/Producto", "Mapa de la Zona"]
+choice = st.sidebar.selectbox("Menú", menu)
 
-# Filtrado de datos
-df_filtrado = df[df['Tipo'].isin(tipo_seleccionado)]
-if zona_seleccionada != "Todas":
-    df_filtrado = df_filtrado[df_filtrado['Zona'] == zona_seleccionada]
+if choice == "Publicar mi Servicio/Producto":
+    st.header("📸 Crea tu publicación")
+    st.info("Sube tu contenido para que el mundo conozca lo que ofreces en Felidia, Dagua y alrededores.")
+    
+    with st.form("form_publicacion", clear_on_submit=True):
+        nombre = st.text_input("¿Cómo se llama tu negocio/servicio?")
+        zona = st.selectbox("¿En qué zona estás?", ["Felidia", "La Leonera", "Tocota", "El Carmen", "Dagua", "San Bernardo", "Alto Dagua"])
+        descripcion = st.text_area("Cuéntanos más (detalles, precios, historia)")
+        
+        # Carga de Archivos
+        foto = st.file_uploader("Sube una foto o video corto", type=["jpg", "png", "mp4"])
+        whatsapp = st.text_input("Tu número de WhatsApp (ej: 57311...)")
+        
+        submit = st.form_submit_button("Publicar al Mundo")
+        
+        if submit:
+            if nombre and foto:
+                st.success(f"¡Gracias {nombre}! Tu publicación está siendo procesada para el muro de {zona}.")
+                # AQUÍ CONECTAREMOS LA BASE DE DATOS EN EL SIGUIENTE PASO
+            else:
+                st.error("Por favor sube al menos una foto y el nombre.")
 
-# 3. Diseño de la Interfaz Principal
-col1, col2 = st.columns([1, 1])
+elif choice == "Ver Muro Comunitario":
+    st.header("📰 Muro de la Comunidad")
+    # Simulando el "Feed" tipo Instagram
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.image("https://via.placeholder.com/600x400", caption="Ejemplo: Café en El Carmen")
+        st.subheader("Café Altura Real")
+        st.write("Producido a 1800msnm. ¡Pide el tuyo!")
+        st.button("Contactar por WhatsApp", key="1")
 
-with col1:
-    st.subheader(f"📍 Resultados en {zona_seleccionada}")
-    for i, row in df_filtrado.iterrows():
-        with st.expander(f"{row['Nombre']} ({row['Tipo']})"):
-            st.write(f"Ubicado en: **{row['Zona']}**")
-            st.button(f"Contactar por WhatsApp", key=f"btn_{i}")
-
-with col2:
-    st.subheader("Mapa de la Región")
-    m = folium.Map(location=[3.5, -76.6], zoom_start=10)
-    for i, row in df_filtrado.iterrows():
-        folium.Marker([row['Lat'], row['Lon']], popup=row['Nombre']).add_to(m)
-    st_folium(m, width=500, height=400)
-
-# 4. Pie de página y Moneda SNG
-st.divider()
-st.info("💡 Recuerda que puedes usar tus tokens **SNG** en comercios aliados.")
+    with col2:
+        st.image("https://via.placeholder.com/600x400", caption="Ejemplo: Turismo en Felidia")
+        st.subheader("Senderos del Pato")
+        st.write("Guianza especializada por el río. $20.000 por persona.")
+        st.button("Contactar por WhatsApp", key="2")
+        
