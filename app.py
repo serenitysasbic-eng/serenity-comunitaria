@@ -1,7 +1,7 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
-from streamlit_folium import st_folium
 import folium
+from streamlit_folium import st_folium
 
 # Configuración de la página
 st.set_page_config(page_title="Serenity Nexus Comunitaria", layout="wide")
