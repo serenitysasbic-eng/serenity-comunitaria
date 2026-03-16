@@ -1,3 +1,24 @@
+from supabase import create_client, Client
+
+# Inicializar conexión con Supabase usando los Secretos
+url: str = st.secrets["SUPABASE_URL"]
+key: str = st.secrets["SUPABASE_KEY"]
+supabase: Client = create_client(url, key)
+
+# Función para guardar una publicación
+def guardar_publicacion(nombre, zona, descripcion, url_imagen, whatsapp):
+    data = {
+        "nombre": nombre,
+        "zona": zona,
+        "descripcion": descripcion,
+        "url_imagen": url_imagen,
+        "whatsapp": whatsapp,
+        "fecha": str(datetime.now())
+    }
+    supabase.table("publicaciones").insert(data).execute()
+
+
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
